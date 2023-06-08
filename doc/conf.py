@@ -19,6 +19,8 @@
 #
 import os
 import sys
+import sphinx
+import shutil
 sys.path.insert(0, os.path.abspath('../source'))
 
 
@@ -31,7 +33,7 @@ sys.path.insert(0, os.path.abspath('../source'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.ifconfig']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -46,7 +48,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'WordCount'
+project = 'Small Fish'
 copyright = '2018, Harsha'
 author = 'Harsha'
 
@@ -89,7 +91,15 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'description': '已有知识，后必再有，已学知识，后必再学',
+    'page_width': '65em',
+    'sidebar_width': '15em',
+    'fixed_sidebar': True,
+    'font_size': 'inherit',
+    'font_family': 'serif',
+
+   }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -119,20 +129,35 @@ htmlhelp_basename = 'WordCountdoc'
 
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
+    'papersize': 'a4paper',
     # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
+    'pointsize': '11pt',
+    # Latex figure (float) alignment
+    'figure_align': 'htbp',
+
+    # Don't mangle with UTF-8 chars
+    'inputenc': '',
+    'utf8extra': '',
+
+    # Set document margins
+    'sphinxsetup': '''
+        hmargin=0.5in, vmargin=1in,
+        parsedliteralwraps=true,
+        verbatimhintsturnover=false,
+    ''',
+
+    # For CJK One-half spacing, need to be in front of hyperref
+    'extrapackages': r'\usepackage{setspace}',
 
     # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
+    'preamble': '''
+        % Use some font with UTF-8 support with XeLaTeX
+        \\usepackage{fontspec}
+        \\setsansfont{DejaVu Sans}
+        \\setromanfont{DejaVu Serif}
+        \\setmonofont{DejaVu Sans Mono}
+    ''',
 
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
