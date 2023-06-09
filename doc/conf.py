@@ -92,11 +92,11 @@ html_theme = 'alabaster'
 # documentation.
 #
 html_theme_options = {
-    'page_width': '65em',
-    'sidebar_width': '15em',
+    'page_width': '90em',
+    'sidebar_width': '20em',
     'fixed_sidebar': True,
-    'font_size': 'inherit',
-    'font_family': 'serif',
+#    'font_size': 'inherit',
+#    'font_family': 'serif',
     'show_related': True,
 
    }
