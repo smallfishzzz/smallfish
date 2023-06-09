@@ -95,8 +95,9 @@ html_theme_options = {
     'page_width': '90em',
     'sidebar_width': '20em',
     'fixed_sidebar': True,
-#    'font_size': 'inherit',
+    'font_size': 'inherit',
 #    'font_family': 'serif',
+    'font_family': 'sans-serif',
     'show_related': True,
 
    }
