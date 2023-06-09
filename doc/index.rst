@@ -8,10 +8,8 @@ Basics
 ==========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   purpose.rst
-   dependencies.rst
    usage.rst
-   credit.rst
-   exercises.rst
+   
+   system/index

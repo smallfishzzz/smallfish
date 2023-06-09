@@ -41,8 +41,8 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+#source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
@@ -92,15 +92,15 @@ html_theme = 'alabaster'
 # documentation.
 #
 html_theme_options = {
-    'description': '已有知识，后必再有，已学知识，后必再学',
     'page_width': '65em',
     'sidebar_width': '15em',
     'fixed_sidebar': True,
     'font_size': 'inherit',
     'font_family': 'serif',
+    'show_related': True,
 
    }
-
+sys.stderr.write("Using %s theme\n" % html_theme)
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -113,8 +113,12 @@ html_static_path = []
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
     '**': [
-        'relations.html',  # needs 'show_related': True theme option to display
+        'about.html',
         'searchbox.html',
+        'navigation.html',
+        'relations.html',  # needs 'show_related': True theme option to display
+        #'localtoc.html',
+        #'globaltoc.html',
     ]
 }
 
@@ -122,7 +126,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'WordCountdoc'
+htmlhelp_basename = 'aaaaaa'
 
 
 # -- Options for LaTeX output ---------------------------------------------
