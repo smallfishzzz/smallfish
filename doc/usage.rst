@@ -4,14 +4,8 @@ Usage
 =====
 
 
-How to clone the code
----------------------
-
-Write me ...
+已有知识， 后必再有
 
 
+                                已学知识， 后必再学
 
-Where to find the results
--------------------------
-
-Write me ...
