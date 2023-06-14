@@ -118,7 +118,7 @@ html_sidebars = {
         'searchbox.html',
         'navigation.html',
         'relations.html',  # needs 'show_related': True theme option to display
-        #'localtoc.html',
+        'localtoc.html',
         #'globaltoc.html',
     ]
 }
