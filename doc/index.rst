@@ -13,3 +13,4 @@ Basics
    usage.rst
    
    system/index
+   kernel/index

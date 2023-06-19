@@ -1,4 +1,4 @@
-.. file system 
+.. system study
 
 System study 
 =================
