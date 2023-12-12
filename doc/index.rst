@@ -14,3 +14,4 @@ Basics
    
    system/index
    kernel/index
+   tpm/index
