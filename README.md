@@ -1,5 +1,8 @@
-# Documentation example
+# 一个文档
 
+sphinx托管 + github pages 构建文档
+
+参考
 We use this example in one [CodeRefinery](https://coderefinery.org/) lesson:
 - https://coderefinery.github.io/documentation/
 
@@ -7,14 +10,14 @@ We use this example in one [CodeRefinery](https://coderefinery.org/) lesson:
 - https://sphinx-doc-zh.readthedocs.io/en/latest/contents.html  
 
 # 目录结构
-
-├── LICENSE         # license file
-├── README.md       # this file
+```bash 
+├── LICENSE         # license file 
+├── README.md       # this file 
 ├── _build          # build directory
-├── doc             # source directory
-├── environment.yml # environment file
-└── source          # source directory
-
+├── doc             # source directory 
+├── environment.yml # environment file 
+└── source          # source directory 
+```
 # 维护命令
 
 编译文档：
