@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>fscrypt &#8212; Small Fish 0.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=ae89d53a" />
+    <script src="../../../_static/documentation_options.js?v=7c91f8fd"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" />
+    <link rel="next" title="title" href="../test.html" />
+    <link rel="prev" title="file system" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Small Fish</a></h1>
+
+
+
+
+
+
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">system study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../kernel/index.html">kernel study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tpm/index.html">TPM</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">system study</a><ul>
+  <li><a href="../index.html">file system</a><ul>
+      <li>Previous: <a href="../index.html" title="上一章">file system</a></li>
+      <li>Next: <a href="../test.html" title="下一章">title</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div>
+    <h3><a href="../../../index.html">目录</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">fscrypt</a><ul>
+<li><a class="reference internal" href="#id1">目录</a></li>
+<li><a class="reference internal" href="#id2">文件加密</a></li>
+<li><a class="reference internal" href="#id3">fscrypt</a></li>
+<li><a class="reference internal" href="#id4">支持的加密算法</a></li>
+<li><a class="reference internal" href="#id5">使用fscrypt加密文件</a></li>
+<li><a class="reference internal" href="#id6">前置条件</a></li>
+<li><a class="reference internal" href="#step1-enable-encrypt">step1 给文件系统enable encrypt 属性</a></li>
+<li><a class="reference internal" href="#step2-fscrypt">step2 fscrypt 初始化</a></li>
+<li><a class="reference internal" href="#step3">step3 加密目录</a></li>
+<li><a class="reference internal" href="#step4-lock-unlock">step4 lock/unlock 目录</a></li>
+<li><a class="reference internal" href="#pam">PAM 模块</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="fscrypt">
+<h1>fscrypt<a class="headerlink" href="#fscrypt" title="Link to this heading">¶</a></h1>
+<section id="id1">
+<h2>目录<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="#文件加密">文件加密</a></p></li>
+<li><p><a class="reference external" href="#fscrypt">fscrypt</a></p></li>
+<li><p><a class="reference external" href="#支持的加密算法">支持的加密算法</a></p></li>
+<li><p><a class="reference external" href="#使用fscrypt加密文件">使用fscrypt加密文件</a></p>
+<ul>
+<li><p><a class="reference external" href="#前置条件">前置条件</a></p></li>
+<li><p><a class="reference external" href="#step1--给文件系统enable--encrypt-属性">step1 给文件系统enable encrypt
+属性</a></p></li>
+<li><p><a class="reference external" href="#step2-fscrypt-初始化">step2 fscrypt 初始化</a></p></li>
+<li><p><a class="reference external" href="#step3-加密目录">step3 加密目录</a></p></li>
+<li><p><a class="reference external" href="#step4--lockunlock--目录">step4 lock/unlock 目录</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="#PAM-模块">PAM 模块</a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>文件加密<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>通常我们会以文件作为数据载体，使用磁盘，USB 闪存，SD卡等存储介质进行数据存储，即便数据已经离线存储，
+仍然不能保证该存储介质不会丢失，如果丢失那么对于我们来说有可能是灾难性的事件。因此对这些离线存储的重
+要数据文件进行加密是非常有必要的。</p>
+</section>
+<section id="id3">
+<h2>fscrypt<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<p>内核中的 fscrypt
+是一个库，文件系统可以使用它以支持文件和目录的透明加密。</p>
+<p>与 dm-crypt 不同，fscrypt 在文件系统级别而不是块设备级别运行。
+这允许它使用不同的密钥加密不同的文件，并在同一文件系统上拥有未加密的文件。
+这对于多用户系统非常有用，在该系统中，每个用户的静态数据都需要与其他用户进行加密隔离。
+除了文件名，fscrypt 不加密文件系统的元数据。</p>
+<p>与作为栈式文件系统的 eCryptfs 不同，fscrypt
+是直接集成到支持的文件系统中，目前支持 fscrypt
+的文件系统是<strong>ext4、F2FS 和 UBIFS</strong></p>
+<p>fscrypt
+允许读取和写入加密文件，而无需在页面缓存中同时缓存解密和加密页面，从而将使用的内存几乎减半并使其与未加密文件保持一致。
+同样，需要一半的 dentry 和 inode。</p>
+<p>eCryptfs 还将加密文件名限制为 143 字节，从而导致应用程序兼容性问题；
+fscrypt 允许完整的 255 个字节 (NAME_MAX)长度的文件名。 最后，与 eCryptfs
+不同，fscrypt API 可以由非特权用户使用，而无需依赖其它任何组件。</p>
+<p>fscrypt 不支持就地加密文件。 相反，它支持将空目录标记为已加密。
+然后，在用户空间提供密钥后，在该目录树中创建的所有常规文件、目录和符号链接都将被透明地加密。</p>
+</section>
+<section id="id4">
+<h2>支持的加密算法<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<p>fscrypt 允许为文件内容指定一种加密模式，为文件名指定一种加密模式。
+不同的目录树允许使用不同的加密方式。 目前支持以下几种加密方式对：</p>
+<p>AES-256-XTS for contents and AES-256-CTS-CBC for filenames</p>
+<p>AES-128-CBC for contents and AES-128-CTS-CBC for filenames</p>
+<p>Adiantum for both contents and filenames</p>
+<p>AES-256-XTS for contents and AES-256-HCTR2 for filenames (v2 policies
+only)</p>
+<p>SM4-XTS for contents and SM4-CTS-CBC for filenames (v2 policies only)</p>
+<p>If unsure, you should use the (AES-256-XTS, AES-256-CTS-CBC) pair.</p>
+<p>AES-128-CBC 仅为具有不支持 XTS 模式的加速器的低功耗嵌入式设备使用。
+要使用 AES-128-CBC，必须启用 CONFIG_CRYPTO_ESSIV 和
+CONFIG_CRYPTO_SHA256（或其他 SHA-256 实现）以便使用 ESSIV。</p>
+<p>Adiantum 是一种基于流密码的模式，即使在没有专用加密指令的 CPU 上也很快。
+与 XTS 不同，它也是真正的宽块模式。
+它还可以消除派生每个文件加密密钥的需要。 要使用 Adiantum，必须启用
+CONFIG_CRYPTO_ADIANTUM。 此外，应启用 ChaCha 和 NHPoly1305
+的快速实现，例如 ARM 架构上的 CONFIG_CRYPTO_CHACHA20_NEON 和
+CONFIG_CRYPTO_NHPOLY1305_NEON。</p>
+<p>AES-256-HCTR2 是另一种真正的宽块加密模式，旨在用于具有专用加密指令的
+CPU。 AES-256-HCTR2 具有明文中的位翻转会更改整个密文的属性。
+由于初始化向量在目录中重复使用，因此此属性使其成为文件名加密的理想选择。
+要使用 AES-256-HCTR2，必须启用 CONFIG_CRYPTO_HCTR2。 此外，应启用 XCTR
+和 POLYVAL 的快速实现，例如 用于 ARM64 的 CRYPTO_POLYVAL_ARM64_CE 和
+CRYPTO_AES_ARM64_CE_BLK。</p>
+<p>最后是 SM4 算法，目前仅在 fscrypt v2 策略中启用。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fscrypt</span> <span class="n">v2</span> <span class="n">版本只在5</span><span class="mf">.4</span> <span class="n">以上内核支持</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html#encryption-modes-and-usage">https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html#encryption-modes-and-usage</a></p>
+</section>
+<section id="id5">
+<h2>使用fscrypt加密文件<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+</section>
+<section id="id6">
+<h2>前置条件<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p>内核配置</p>
+<ul class="simple">
+<li><p>CONFIG_EXT4_FS_ENCRYPTION=y</p></li>
+<li><p>CONFIG_F2FS_FS_ENCRYPTION=y</p></li>
+<li><p>CONFIG_FS_ENCRYPTION=m</p></li>
+</ul>
+<p>文件系统</p>
+<ul class="simple">
+<li><p>ext4</p></li>
+</ul>
+</section>
+<section id="step1-enable-encrypt">
+<h2>step1 给文件系统enable encrypt 属性<a class="headerlink" href="#step1-enable-encrypt" title="Link to this heading">¶</a></h2>
+<p>对于ext4，要在其上使用加密的文件系统必须启用加密功能标志。要启用它，请运行：</p>
+<blockquote>
+<div><p>&gt; tune2fs -O encrypt /dev/DEVICE</p>
+</div></blockquote>
+<p>如果是新建的一个文件系统， 可以使用 mkfs.ext4 -O encrypt</p>
+</section>
+<section id="step2-fscrypt">
+<h2>step2 fscrypt 初始化<a class="headerlink" href="#step2-fscrypt" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><p>&gt; fscrypt setup</p>
+</div></blockquote>
+<p>这个命令会创建文件 /etc/fscrypt.conf 还有一个目录/.fscrypt</p>
+<p>如果要加密的文件不是根文件系统， 运行：</p>
+<blockquote>
+<div><p>&gt; mount /dev/DEVICE /home/uos/mnt</p>
+</div></blockquote>
+<blockquote>
+<div><p>&gt; fscrypt setup /home/uos/mnt</p>
+</div></blockquote>
+<p>这个命令会创建文件 /home/uos/mnt/.fscrypt</p>
+<p>/etc/fscrypt.conf 配置文件内容如下：</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;custom_passphrase&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//默认保护原  pam_passphrase、custom_passphrase、raw_key</span>
+<span class="w">  </span><span class="nt">&quot;hash_costs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// 描述密封hash的难度</span>
+<span class="w">    </span><span class="nt">&quot;time&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;52&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;memory&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;131072&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;parallelism&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;32&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;options&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 加密选项</span>
+<span class="w">    </span><span class="nt">&quot;padding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;32&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">//加密文件的填充字节数 32、16、8、4</span>
+<span class="w">    </span><span class="nt">&quot;contents&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AES_256_XTS&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1">//加密文件内容的算法</span>
+<span class="w">    </span><span class="nt">&quot;filenames&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AES_256_CTS&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">// 加密文件目录名字的算法</span>
+<span class="w">    </span><span class="nt">&quot;policy_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2&quot;</span><span class="w">  </span><span class="c1">// 加密策略的版本， 只有5.4 以上的内核才支持2</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;use_fs_keyring_for_v1_policies&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">  </span><span class="c1">//此设置的目的是允许人们利用与较旧内核兼容的加密目录上Linux V5.4的一些改进</span>
+<span class="w">  </span><span class="nt">&quot;allow_cross_user_metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">  </span><span class="c1">//指定FSCRYPT是否允许阅读其他非根本用户的保护者和策略，例如fscrypt加密作为选项提供</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="step3">
+<h2>step3 加密目录<a class="headerlink" href="#step3" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w">  </span>mkdir<span class="w">   </span>/home/uos/mnt/dir
+&gt;<span class="w">  </span>fscrypt<span class="w"> </span>encrypt<span class="w">  </span>/home/uos/mnt/dir
+&gt;<span class="w">  </span>sudo<span class="w"> </span>fscrypt<span class="w"> </span>encrypt<span class="w"> </span>/home/uos/mnt/dir<span class="w">  </span>--user<span class="o">=</span>uos
+The<span class="w"> </span>following<span class="w"> </span>protector<span class="w"> </span>sources<span class="w"> </span>are<span class="w"> </span>available:
+<span class="m">1</span><span class="w"> </span>-<span class="w"> </span>Your<span class="w"> </span>login<span class="w"> </span>passphrase<span class="w"> </span><span class="o">(</span>pam_passphrase<span class="o">)</span><span class="w">  </span><span class="c1"># 使用用户登录的口令，需要配置相应的pam 模块</span>
+<span class="m">2</span><span class="w"> </span>-<span class="w"> </span>A<span class="w"> </span>custom<span class="w"> </span>passphrase<span class="w"> </span><span class="o">(</span>custom_passphrase<span class="o">)</span><span class="w"> </span><span class="c1"># 使用用户自定义的口令</span>
+<span class="m">3</span><span class="w"> </span>-<span class="w"> </span>A<span class="w"> </span>raw<span class="w"> </span><span class="m">256</span>-bit<span class="w"> </span>key<span class="w"> </span><span class="o">(</span>raw_key<span class="o">)</span><span class="w">          </span><span class="c1"># 其他256位的key</span>
+Enter<span class="w"> </span>the<span class="w"> </span><span class="nb">source</span><span class="w"> </span>number<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>new<span class="w"> </span>protector<span class="w"> </span><span class="o">[</span><span class="m">2</span><span class="w"> </span>-<span class="w"> </span>custom_passphrase<span class="o">]</span>:<span class="w"> </span><span class="m">2</span>
+Enter<span class="w"> </span>a<span class="w"> </span>name<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>new<span class="w"> </span>protector:<span class="w"> </span>fish
+Enter<span class="w"> </span>custom<span class="w"> </span>passphrase<span class="w"> </span><span class="k">for</span><span class="w"> </span>protector<span class="w"> </span><span class="s2">&quot;fish&quot;</span>:
+Confirm<span class="w"> </span>passphrase:
+<span class="s2">&quot;/home/uos/test/fscrypt_mnt/dir&quot;</span><span class="w"> </span>is<span class="w"> </span>now<span class="w"> </span>encrypted,<span class="w"> </span>unlocked,<span class="w"> </span>and<span class="w"> </span>ready<span class="w"> </span><span class="k">for</span><span class="w"> </span>use.
+</pre></div>
+</div>
+<p><strong>Tip : 被加密的目录必须为空, 如果要加密已有内容的目录， 需要先移出去</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>mkdir<span class="w"> </span>new_dir
+&gt;<span class="w"> </span>fscrypt<span class="w"> </span>encrypt<span class="w"> </span>new_dir
+&gt;<span class="w"> </span>cp<span class="w"> </span>-a<span class="w"> </span>-T<span class="w"> </span>old_dir<span class="w"> </span>new_dir
+&gt;<span class="w"> </span>find<span class="w"> </span>old_dir<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-print0<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>-0<span class="w"> </span>shred<span class="w"> </span>-n1<span class="w"> </span>--remove<span class="o">=</span>unlink
+&gt;<span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>old_dir
+</pre></div>
+</div>
+</section>
+<section id="step4-lock-unlock">
+<h2>step4 lock/unlock 目录<a class="headerlink" href="#step4-lock-unlock" title="Link to this heading">¶</a></h2>
+<p>准备工作：</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span><span class="nb">cd</span><span class="w">  </span>/home/uos/mnt/dir
+&gt;<span class="w"> </span>mkdir<span class="w"> </span>aaa
+&gt;<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;hello world&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>aaa/a.txt
+&gt;<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>..
+&gt;<span class="w"> </span>tree<span class="w"> </span>.
+.
+└──<span class="w"> </span>dir
+<span class="w">    </span>└──<span class="w"> </span>aaa
+<span class="w">        </span>└──<span class="w"> </span>a.txt
+
+<span class="m">2</span><span class="w"> </span>directories,<span class="w"> </span><span class="m">1</span><span class="w"> </span>file
+</pre></div>
+</div>
+<p>lock</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>sudo<span class="w"> </span>fscrypt<span class="w"> </span>lock<span class="w"> </span>./dir/<span class="w">  </span>--user<span class="o">=</span>uos
+Encrypted<span class="w"> </span>data<span class="w"> </span>removed<span class="w"> </span>from<span class="w"> </span>filesystem<span class="w"> </span>cache.
+<span class="s2">&quot;./dir/&quot;</span><span class="w"> </span>is<span class="w"> </span>now<span class="w"> </span>locked.
+
+&gt;<span class="w"> </span>tree<span class="w"> </span>.
+.
+└──<span class="w"> </span>dir
+<span class="w">    </span>└──<span class="w"> </span>FlXWBy9XVFYB3+EXd9tsBX7kNGpj4Vz0RGhmw4QfJ4K
+<span class="w">        </span>└──<span class="w"> </span>tCJi0VMPGkfLM6iPnqbi9YAYnErm2nPMvJLMrYtwxwB
+
+<span class="m">2</span><span class="w"> </span>directories,<span class="w"> </span><span class="m">1</span><span class="w"> </span>file
+
+
+&gt;<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>dir/FlXWBy9XVFYB3+EXd9tsBX7kNGpj4Vz0RGhmw4QfJ4K/
+&gt;<span class="w"> </span>cat<span class="w"> </span>tCJi0VMPGkfLM6iPnqbi9YAYnErm2nPMvJLMrYtwxwB
+cat:<span class="w"> </span>tCJi0VMPGkfLM6iPnqbi9YAYnErm2nPMvJLMrYtwxwB:<span class="w"> </span>需要的关键字不存在
+
+&gt;<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>-
+</pre></div>
+</div>
+<p>status</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>fscrypt<span class="w"> </span>status<span class="w"> </span>dir
+<span class="s2">&quot;dir&quot;</span><span class="w"> </span>is<span class="w"> </span>encrypted<span class="w"> </span>with<span class="w"> </span>fscrypt.
+
+Policy:<span class="w">   </span>e7f93b6219638134
+Options:<span class="w">  </span>padding:32<span class="w"> </span>contents:AES_256_XTS<span class="w"> </span>filenames:AES_256_CTS<span class="w"> </span>policy_version:1
+Unlocked:<span class="w"> </span>No
+
+Protected<span class="w"> </span>with<span class="w"> </span><span class="m">1</span><span class="w"> </span>protector:
+PROTECTOR<span class="w">         </span>LINKED<span class="w">  </span>DESCRIPTION
+575642ae2964c6d4<span class="w">  </span>No<span class="w">      </span>custom<span class="w"> </span>protector<span class="w"> </span><span class="s2">&quot;fish&quot;</span>
+</pre></div>
+</div>
+<p>unlock</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>sudo<span class="w"> </span>fscrypt<span class="w"> </span>unlock<span class="w">  </span>dir<span class="w"> </span>--user<span class="o">=</span>uos
+Enter<span class="w"> </span>custom<span class="w"> </span>passphrase<span class="w"> </span><span class="k">for</span><span class="w"> </span>protector<span class="w"> </span><span class="s2">&quot;fish&quot;</span>:
+<span class="s2">&quot;dir&quot;</span><span class="w"> </span>is<span class="w"> </span>now<span class="w"> </span>unlocked<span class="w"> </span>and<span class="w"> </span>ready<span class="w"> </span><span class="k">for</span><span class="w"> </span>use.
+&gt;<span class="w"> </span>tree<span class="w"> </span>.
+.
+└──<span class="w"> </span>dir
+<span class="w">    </span>└──<span class="w"> </span>aaa
+<span class="w">        </span>└──<span class="w"> </span>a.txt
+
+<span class="m">2</span><span class="w"> </span>directories,<span class="w"> </span><span class="m">1</span><span class="w"> </span>file
+
+&gt;<span class="w"> </span>cat<span class="w">  </span>dir/aaa/a.txt
+hello<span class="w"> </span>world
+</pre></div>
+</div>
+</section>
+<section id="pam">
+<h2>PAM 模块<a class="headerlink" href="#pam" title="Link to this heading">¶</a></h2>
+<p>要在登录时自动解锁受登录密码短语保护的目录，并使受登录密码保护的目录与登录密码短语的更改保持同步，请调整系统PAM配置以启用PAM_fscrypt。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/etc/pam.d/login
+
+auth<span class="w">  </span>option<span class="w">  </span>pam_fscrypt.so
+</pre></div>
+</div>
+<p>代码地址</p>
+<p><a class="reference external" href="https://github.com/google/fscrypt">https://github.com/google/fscrypt</a></p>
+<p><a class="reference external" href="https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html">https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html</a></p>
+<p><a class="reference external" href="https://openanolis.github.io/whitebook-shangmi/kernel_fscrypt.html">https://openanolis.github.io/whitebook-shangmi/kernel_fscrypt.html</a></p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2018, Harsha.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../../../_sources/system/fs/fscrypt/fscrypt.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

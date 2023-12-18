@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>git tips &#8212; Small Fish 0.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=ae89d53a" />
+    <script src="../../_static/documentation_options.js?v=7c91f8fd"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="kernel study" href="../../kernel/index.html" />
+    <link rel="prev" title="git" href="index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Small Fish</a></h1>
+
+
+
+
+
+
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">system study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../kernel/index.html">kernel study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tpm/index.html">TPM</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">system study</a><ul>
+  <li><a href="index.html">git</a><ul>
+      <li>Previous: <a href="index.html" title="上一章">git</a></li>
+      <li>Next: <a href="../../kernel/index.html" title="下一章">kernel study</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div>
+    <h3><a href="../../index.html">目录</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">git tips</a><ul>
+<li><a class="reference internal" href="#set-ssh-http-https-proxy-for-git">set ssh 、http/https proxy for git</a><ul>
+<li><a class="reference internal" href="#ssh-protocol">ssh protocol</a></li>
+<li><a class="reference internal" href="#http-https-protocol">http/https protocol</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reference-connection">reference connection</a><ul>
+<li><a class="reference internal" href="#github">github</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="git-tips">
+<h1>git tips<a class="headerlink" href="#git-tips" title="Link to this heading">¶</a></h1>
+<section id="set-ssh-http-https-proxy-for-git">
+<h2>set ssh 、http/https proxy for git<a class="headerlink" href="#set-ssh-http-https-proxy-for-git" title="Link to this heading">¶</a></h2>
+<section id="ssh-protocol">
+<h3>ssh protocol<a class="headerlink" href="#ssh-protocol" title="Link to this heading">¶</a></h3>
+<p><strong>edit the file ~/.ssh/config</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Host<span class="w"> </span>github.com
+<span class="w">  </span>User<span class="w"> </span>git
+<span class="w">  </span>ProxyCommand<span class="w"> </span>nc<span class="w"> </span>-x<span class="w"> </span>localhost:12123<span class="w"> </span>%h<span class="w"> </span>%p
+</pre></div>
+</div>
+</section>
+<section id="http-https-protocol">
+<h3>http/https protocol<a class="headerlink" href="#http-https-protocol" title="Link to this heading">¶</a></h3>
+<p>Enter the following command on the terminal.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>&gt;<span class="w"> </span>global<span class="w"> </span>effective
+&gt;<span class="w"> </span>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>http.proxy<span class="w"> </span>http://localhost:12123<span class="w">  </span>%h<span class="w"> </span>%p
+&gt;<span class="w"> </span>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>https.proxy<span class="w"> </span>https://localhost:12123<span class="w">  </span>%h<span class="w"> </span>%p
+&gt;<span class="w"> </span>locally<span class="w"> </span>effective
+&gt;<span class="w"> </span>git<span class="w"> </span>config<span class="w"> </span>http.proxy<span class="w"> </span>http://localhost:12123<span class="w">  </span>%h<span class="w"> </span>%p
+&gt;<span class="w"> </span>git<span class="w"> </span>config<span class="w"> </span>https.proxy<span class="w"> </span>https://localhost:12123<span class="w">  </span>%h<span class="w"> </span>%p
+</pre></div>
+</div>
+<blockquote>
+<div><p>and you can also edit  ~/.gitconfig (global)  or  .git/config (git source directory)</p>
+</div></blockquote>
+</section>
+</section>
+<section id="reference-connection">
+<h2>reference connection<a class="headerlink" href="#reference-connection" title="Link to this heading">¶</a></h2>
+<section id="github">
+<h3>github<a class="headerlink" href="#github" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><p><a class="reference external" href="https://gist.github.com/coin8086/7228b177221f6db913933021ac33bb92">Use Proxy for Git/GitHub</a></p>
+</div></blockquote>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2018, Harsha.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../../_sources/system/git/git.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

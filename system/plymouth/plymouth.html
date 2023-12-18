@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>plymouth debug &#8212; Small Fish 0.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=ae89d53a" />
+    <script src="../../_static/documentation_options.js?v=7c91f8fd"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="搜索" href="../../search.html" />
+    <link rel="next" title="git" href="../git/index.html" />
+    <link rel="prev" title="plymouth" href="index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Small Fish</a></h1>
+
+
+
+
+
+
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">system study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../kernel/index.html">kernel study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tpm/index.html">TPM</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">system study</a><ul>
+  <li><a href="index.html">plymouth</a><ul>
+      <li>Previous: <a href="index.html" title="上一章">plymouth</a></li>
+      <li>Next: <a href="../git/index.html" title="下一章">git</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div>
+    <h3><a href="../../index.html">目录</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">plymouth debug</a><ul>
+<li><a class="reference internal" href="#get-plymouth-debug-log">get plymouth debug log</a></li>
+<li><a class="reference internal" href="#debug-plymouth-in-post-boot">debug plymouth in post boot</a></li>
+<li><a class="reference internal" href="#reference-connection">reference connection</a></li>
+<li><a class="reference internal" href="#ubuntu-wiki">ubuntu wiki</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="plymouth-debug">
+<h1>plymouth debug<a class="headerlink" href="#plymouth-debug" title="Link to this heading">¶</a></h1>
+<section id="get-plymouth-debug-log">
+<h2>get plymouth debug log<a class="headerlink" href="#get-plymouth-debug-log" title="Link to this heading">¶</a></h2>
+<ol class="simple">
+<li><p>vim /etc/default/grub and add <code class="docutils literal notranslate"><span class="pre">plymouth:debug</span></code> in GRUB_CMDLINE_LINUX_DEFAULT</p></li>
+<li><p>debug log  file <code class="docutils literal notranslate"><span class="pre">/var/log/plymouth-debug.log</span></code></p></li>
+</ol>
+</section>
+<section id="debug-plymouth-in-post-boot">
+<h2>debug plymouth in post boot<a class="headerlink" href="#debug-plymouth-in-post-boot" title="Link to this heading">¶</a></h2>
+<ol class="simple">
+<li><p>Boot system and login as usual</p></li>
+<li><p>Install plymouth-x11 package (allows you to see the boot screen in an X11 window)</p>
+<ul class="simple">
+<li><p>sudo apt-get install plymouth-x11</p></li>
+</ul>
+</li>
+<li><p>Start a terminal</p></li>
+<li><p>Start the Plymouth daemon by running the following:</p>
+<ul class="simple">
+<li><p>sudo plymouthd –debug –tty=<code class="docutils literal notranslate"><span class="pre">tty</span></code> –no-daemon</p></li>
+</ul>
+</li>
+<li><p>plymouth client running :
+plymouth –show-splash</p></li>
+</ol>
+<p>quit debug</p>
+<blockquote>
+<div><p>sudo plymouth –quit</p>
+</div></blockquote>
+</section>
+<section id="reference-connection">
+<h2>reference connection<a class="headerlink" href="#reference-connection" title="Link to this heading">¶</a></h2>
+</section>
+<section id="ubuntu-wiki">
+<h2>ubuntu wiki<a class="headerlink" href="#ubuntu-wiki" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">wiki</span><span class="o">.</span><span class="n">ubuntu</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Plymouth</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2018, Harsha.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../../_sources/system/plymouth/plymouth.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

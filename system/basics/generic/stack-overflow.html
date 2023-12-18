@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>stack smashing detected &#8212; Small Fish 0.1 文档</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=ae89d53a" />
+    <script src="../../../_static/documentation_options.js?v=7c91f8fd"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=beaddf03"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="搜索" href="../../../search.html" />
+    <link rel="next" title="file system" href="../../fs/index.html" />
+    <link rel="prev" title="system generic" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Small Fish</a></h1>
+
+
+
+
+
+
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">快速搜索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="提交" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>导航</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">system study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../kernel/index.html">kernel study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tpm/index.html">TPM</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">system study</a><ul>
+  <li><a href="../index.html">system generic</a><ul>
+      <li>Previous: <a href="../index.html" title="上一章">system generic</a></li>
+      <li>Next: <a href="../../fs/index.html" title="下一章">file system</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div>
+    <h3><a href="../../../index.html">目录</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">stack smashing detected</a><ul>
+<li><a class="reference internal" href="#id1">这个代码会造成栈溢出</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="stack-smashing-detected">
+<h1>stack smashing detected<a class="headerlink" href="#stack-smashing-detected" title="Link to this heading">¶</a></h1>
+<section id="id1">
+<h2>这个代码会造成栈溢出<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdbool.h&gt;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">set_val</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="o">*</span><span class="n">val</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">set_val</span><span class="p">(</span><span class="o">&amp;</span><span class="n">i</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>当编译代码的时候打开了栈保护的时候，-fstack-protector-strong 或者 -fstack-protector-all，编译器会在栈上放置一个随机数，当函数返回的时候会检查这个随机数是否被修改，如果被修改了，就会报错。</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nf">Dump</span><span class="w"> </span><span class="no">of</span><span class="w"> </span><span class="no">assembler</span><span class="w"> </span><span class="no">code</span><span class="w"> </span><span class="no">for</span><span class="w"> </span><span class="no">function</span><span class="w"> </span><span class="no">main</span><span class="p">:</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x0000555555555162</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">0</span><span class="err">&gt;</span><span class="p">:</span><span class="w">     </span><span class="no">endbr64</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x0000555555555166</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">4</span><span class="err">&gt;</span><span class="p">:</span><span class="w">     </span><span class="no">push</span><span class="w">   </span><span class="nv">%rbp</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x0000555555555167</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">5</span><span class="err">&gt;</span><span class="p">:</span><span class="w">     </span><span class="no">mov</span><span class="w">    </span><span class="nv">%rsp</span><span class="p">,</span><span class="nv">%rbp</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x000055555555516a</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">8</span><span class="err">&gt;</span><span class="p">:</span><span class="w">     </span><span class="no">sub</span><span class="w">    </span><span class="no">$0x10</span><span class="p">,</span><span class="nv">%rsp</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x000055555555516e</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">12</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">mov</span><span class="w">    </span><span class="nv">%fs</span><span class="p">:</span><span class="mi">0x28</span><span class="p">,</span><span class="nv">%rax</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x0000555555555177</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">21</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">mov</span><span class="w">    </span><span class="nv">%rax</span><span class="p">,-</span><span class="mi">0x8</span><span class="p">(</span><span class="nv">%rbp</span><span class="p">)</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x000055555555517b</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">25</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">xor</span><span class="w">    </span><span class="nv">%eax</span><span class="p">,</span><span class="nv">%eax</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x000055555555517d</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">27</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">movb</span><span class="w">   </span><span class="no">$0x0</span><span class="p">,-</span><span class="mi">0x9</span><span class="p">(</span><span class="nv">%rbp</span><span class="p">)</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x0000555555555181</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">31</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">lea</span><span class="w">    </span><span class="mi">-0</span><span class="no">x9</span><span class="p">(</span><span class="nv">%rbp</span><span class="p">),</span><span class="nv">%rax</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x0000555555555185</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">35</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">mov</span><span class="w">    </span><span class="nv">%rax</span><span class="p">,</span><span class="nv">%rdi</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x0000555555555188</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">38</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">call</span><span class="w">   </span><span class="mh">0x555555555149</span> <span class="p">&lt;</span><span class="no">set_val</span><span class="p">&gt;</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x000055555555518d</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">43</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">mov</span><span class="w">    </span><span class="no">$0x0</span><span class="p">,</span><span class="nv">%eax</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x0000555555555192</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">48</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">mov</span><span class="w">    </span><span class="mi">-0</span><span class="no">x8</span><span class="p">(</span><span class="nv">%rbp</span><span class="p">),</span><span class="nv">%rdx</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x0000555555555196</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">52</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">sub</span><span class="w">    </span><span class="nv">%fs</span><span class="p">:</span><span class="mi">0x28</span><span class="p">,</span><span class="nv">%rdx</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x000055555555519f</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">61</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">je</span><span class="w">     </span><span class="mh">0x5555555551a6</span> <span class="p">&lt;</span><span class="no">main</span><span class="p">+</span><span class="mi">68</span><span class="p">&gt;</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x00005555555551a1</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">63</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">call</span><span class="w">   </span><span class="mh">0x555555555050</span> <span class="p">&lt;</span><span class="no">__stack_chk_fail@plt</span><span class="p">&gt;</span>
+<span class="err">=&gt;</span><span class="w"> </span><span class="err">0</span><span class="nf">x00005555555551a6</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">68</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">leave</span>
+<span class="w">   </span><span class="err">0</span><span class="nf">x00005555555551a7</span><span class="w"> </span><span class="err">&lt;+</span><span class="mi">69</span><span class="err">&gt;</span><span class="p">:</span><span class="w">    </span><span class="no">ret</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2018, Harsha.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../../../_sources/system/basics/generic/stack-overflow.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
