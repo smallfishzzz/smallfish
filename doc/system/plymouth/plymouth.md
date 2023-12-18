@@ -1,5 +1,5 @@
-plymouth
-==============
+plymouth debug
+====================
 
 
 ## get plymouth debug log

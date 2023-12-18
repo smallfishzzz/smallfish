@@ -10,3 +10,4 @@ system study
     basics/index
     fs/index
     plymouth/index
+    git/index

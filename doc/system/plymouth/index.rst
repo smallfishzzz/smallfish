@@ -1,6 +1,6 @@
 .. plymouth 
 
-plymouth debug
+plymouth
 ===================
 
 .. toctree::
